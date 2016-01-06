@@ -1508,8 +1508,12 @@ grammar Perl6::Grammar is HLL::Grammar does STD {
                             my $vwant := $<version>.ast.compile_time_value;
                             my $vhave := $*W.find_symbol(['Version']).new(
                                 nqp::getcomp('perl6').language_version());
+                            my $vcould := $*W.find_symbol(['Version']).new('6.d');
                             my $sm := $*W.find_symbol(['&infix:<~~>']);
-                            if !$sm($vhave,$vwant) {
+                            if $sm($vcould, $vwant) {
+                                $*W.load_setting($/, 'CORE.d');
+                            }
+                            elsif !$sm($vhave,$vwant) {
                                 $/.CURSOR.typed_panic: 'X::Language::Unsupported', version => ~$<version>;
                             }
                             $*MAIN   := 'MAIN';
